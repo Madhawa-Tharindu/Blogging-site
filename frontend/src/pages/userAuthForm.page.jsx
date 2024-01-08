@@ -1,5 +1,6 @@
 import InputBox from "../components/input.component";
 import googleIcon from "../imgs/google.png";
+import { Link } from "react-router-dom";
 
 
 
@@ -52,6 +53,17 @@ const UserAuthForm = ({ type }) => {
                     <img src={googleIcon} className="w-5" />
                     Continue with Google
                 </button>
+
+                {
+                    type =="sign-in" ?
+                    <p className="mt-6 text-dark-grey text-xl text-center">
+                        Don't have an account? <Link to="/signup" className="underline text-black text-xl ml-1">Join Us Today</Link>
+                    </p>
+                    : 
+                    <p className="mt-6 text-dark-grey text-xl text-center">
+                        Already a member? <Link to="/signin" className="underline text-black text-xl ml-1">Sign in here</Link>
+                    </p>
+                }
             </form>
 
         </section>

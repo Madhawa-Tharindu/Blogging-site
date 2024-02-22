@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
+import { nanoid } from 'nanoid';
 
 // import schemas below
 import User from './Schema/User.js';
@@ -19,6 +20,14 @@ server.use(express.json());
 mongoose.connect(process.env.DB_LOCATION, {
     autoIndex: true,
 });
+
+const generateUserName = async (email) => {
+    let username = email.split('@')[0];
+    
+    let isUserNameNotUnique = await User.exists({ "personal_info.username" : username}).then((result) => result);
+    isUserNameNotUnique ? username += nanoid() : "";
+    return username;
+}
 
 server.post("/signup", (req, res) => {
     let { fullName, email, password } = req.body;
@@ -40,8 +49,12 @@ server.post("/signup", (req, res) => {
     // password hashing function
     bcrypt.hash(password, 10, (err, hashed_password) => {
         // console.log(err, hashed_password);
-        
-        let username = email.split("@")[0];
+        if (err) {
+            console.error("Error hashing password:", err);
+            return res.status(500).json({ "error": "Internal server error" });
+        }
+
+        let username = generateUserName();
 
         let user = new User({
             personal_info: {
@@ -56,12 +69,16 @@ server.post("/signup", (req, res) => {
             res.status(200).json({user: u})
         })
         .catch((err) => {
+            if(err.code === 11000){
+                return res.status(500).json({"error": "Email already exists!"})
+            }
+
             return res.status(500).json({"error": err.message});
         });
-   })
+   });
 
 
-    return res.status(200).json({"message": "User created successfully"});
+    //return res.status(200).json({"message": "User created successfully"});
 })
 
 server.listen(PORT, () => {

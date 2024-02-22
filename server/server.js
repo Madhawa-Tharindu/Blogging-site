@@ -1,6 +1,10 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import 'dotenv/config';
+import bcrypt from 'bcrypt';
+
+// import schemas below
+import User from './Schema/User.js';
 
 
 const server = express();
@@ -33,6 +37,30 @@ server.post("/signup", (req, res) => {
         return res.status(403).json({"error": "Password should be 6 to 20 characters long with a numeric, at least 1uppercase letter, one lowercase letter, and one number"});
     
     }
+    // password hashing function
+    bcrypt.hash(password, 10, (err, hashed_password) => {
+        // console.log(err, hashed_password);
+        
+        let username = email.split("@")[0];
+
+        let user = new User({
+            personal_info: {
+                fullname: fullName,
+                email: email,
+                password: hashed_password,
+                username: username,
+            }
+        });
+
+        user.save().then((u) => {
+            res.status(200).json({user: u})
+        })
+        .catch((err) => {
+            return res.status(500).json({"error": err.message});
+        });
+   })
+
+
     return res.status(200).json({"message": "User created successfully"});
 })
 

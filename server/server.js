@@ -94,6 +94,32 @@ server.post("/signup", async(req, res) => {
     //return res.status(200).json({"message": "User created successfully"});
 })
 
+server.post("/login", (req, res) => {
+    let { email, password } = req.body;
+
+    User.findOne({"personal_info.email": email}).then((user) => {
+        if (!user){
+            return res.status(404).json({"error": "Email not found"});
+        }
+
+        bcrypt.compare(password, user.personal_info.password, (err, result) => {
+            if (err){
+                return res.status(403).json({"error": "Error occurred while login. Please Try again!"});
+            }
+
+            if (!result){
+                return res.status(403).json({"error": "Invalid Password!"});
+            }
+            else{
+                return res.status(200).json(formatDataToSend(user));
+            }
+        });
+    })
+    .catch((err) => {
+        return res.status(500).json({"error": err.message});
+    });
+})
+
 server.listen(PORT, () => {
     console.log('listening on port '+ PORT);
 })

@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
 import { nanoid } from 'nanoid';
+import jwt from 'jsonwebtoken';
 
 // import schemas below
 import User from './Schema/User.js';
@@ -29,11 +30,23 @@ const generateUserName = async (email) => {
     return username;
 }
 
-server.post("/signup", (req, res) => {
-    let { fullName, email, password } = req.body;
+const formatDataToSend = (user) => {
+    
+    const access_token = jwt.sign({is: user._id}, process.env.SECRET_ACCESS_KEY);
+
+    return {
+        access_token,
+        profile_img: user.personal_info.profile_img,
+        username: user.personal_info.username,
+        fullname: user.personal_info.fullname,
+    }
+}
+
+server.post("/signup", async(req, res) => {
+    let { fullname, email, password } = req.body;
 
     //validating the data from frontend
-    if (fullName.length < 3){
+    if (!fullname || fullname.length < 3){
         return res.status(403).json({"error": "Full Name must be at least 3 characters long"});
     }
     if (!email.length || !email.includes('@') || !email.includes('.')){
@@ -47,18 +60,18 @@ server.post("/signup", (req, res) => {
     
     }
     // password hashing function
-    bcrypt.hash(password, 10, (err, hashed_password) => {
+    bcrypt.hash(password, 10, async(err, hashed_password) => {
         // console.log(err, hashed_password);
         if (err) {
             console.error("Error hashing password:", err);
             return res.status(500).json({ "error": "Internal server error" });
         }
 
-        let username = generateUserName();
+        let username = await generateUserName(email);
 
         let user = new User({
             personal_info: {
-                fullname: fullName,
+                fullname: fullname,
                 email: email,
                 password: hashed_password,
                 username: username,
@@ -66,7 +79,7 @@ server.post("/signup", (req, res) => {
         });
 
         user.save().then((u) => {
-            res.status(200).json({user: u})
+            res.status(200).json(formatDataToSend(user));
         })
         .catch((err) => {
             if(err.code === 11000){

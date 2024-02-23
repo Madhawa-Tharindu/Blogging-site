@@ -10,7 +10,7 @@ POST http://localhost:3000/signup
 Content-Type: application/json
 
 {
-    "fullName": "Mad",
-    "email": "madhawath@gmail.com",
-    "password" : "Madhawa123"
+    "fullname": "Madev3",
+    "email": "madhawath3@gmail.com",
+    "password" : "Madhawa1234"
 }

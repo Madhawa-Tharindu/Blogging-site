@@ -14,6 +14,7 @@ const UserAuthForm = ({ type }) => {
     const AuthForm = useRef();
 
     const userAuthThroughServer = (serverRoute, formData) => {
+        console.log("VITE_SERVER_DOMAIN:", import.meta.env.VITE_SERVER_DOMAIN);
        axios.post(import.meta.env.VITE_SERVER_DOMAIN + serverRoute, formData)
        .then(({ data }) => {
         console.log(data);
@@ -21,19 +22,21 @@ const UserAuthForm = ({ type }) => {
        .catch(({ response }) => {
         toast.error(response.data.error);
        })
-       }
+
     }
 
+
     const handleSubmit = (e) => {
+
         e.preventDefault();
 
-        let serverRoute = type === 'sign-in' ? "/signin" : "signup" 
-        //formData
+        let serverRoute = type === 'sign-in' ? "/login" : "/signup"; 
+        
         //Regex
         let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
         let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
 
-
+        //formData
         let form = new FormData(AuthForm.current);
         console.log(form);
         let formData = {};
@@ -110,9 +113,9 @@ const UserAuthForm = ({ type }) => {
                     
                 </button>
                 <div className="relative w-full flex items-center gap-2 my-10 opacity-10 uppercase text-black font-bold">
-                    <hr className="w-1/2" border-black/>
+                    <hr className="w-1/2 border-black" />
                     <p>or</p>
-                    <hr className="w-1/2" border-black/>
+                    <hr className="w-1/2 border-black" />
                 </div>
 
                 <button className="btn-dark flex items-center justify-center gap-4 w-[90%] center">

@@ -5,6 +5,7 @@ import googleIcon from "../imgs/google.png";
 import { Link } from "react-router-dom";
 import { Toaster, toast } from 'react-hot-toast';
 import axios from 'axios';
+import { storeInSession } from "../common/session";
 //import { UserContext } from "../App";
 
 
@@ -23,6 +24,8 @@ const UserAuthForm = ({ type }) => {
        axios.post(import.meta.env.VITE_SERVER_DOMAIN + serverRoute, formData)
        .then(({ data }) => {
         console.log(data);
+        storeInSession("user", JSON.stringify(data));
+        console.log(sessionStorage);
        })
        .catch(({ response }) => {
         toast.error(response.data.error);

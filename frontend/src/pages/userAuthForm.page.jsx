@@ -4,7 +4,7 @@ import InputBox from "../components/input.component";
 import googleIcon from "../imgs/google.png";
 import { Link } from "react-router-dom";
 
-
+/* useRef is a tool in React that helps you keep track of things in your app without causing it to rerender. */  
 
 const UserAuthForm = ({ type }) => {
     
@@ -16,6 +16,13 @@ const UserAuthForm = ({ type }) => {
         //formData
         let form = new FormData(AuthForm.current);
         console.log(form);
+        let formData = {};
+
+        for (let [key, value] of form.entries()) {
+            formData[key] = value;
+        }
+
+        console.log(formData);
     }
 
 

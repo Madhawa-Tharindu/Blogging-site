@@ -7,6 +7,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import axios from 'axios';
 import { storeInSession } from "../common/session";
 import { UserContext } from "../App";
+import { authWithGoogle } from "../common/firebase";
 
 
 /* useRef is a tool in React that helps you keep track of things in your app without causing it to rerender. */  
@@ -82,6 +83,17 @@ const UserAuthForm = ({ type }) => {
         userAuthThroughServer(serverRoute, formData);
 
     }
+    const handleGoogleAuth = (e) => {
+        e.preventDefault();
+
+        authWithGoogle().then(user => {
+            console.log(user);
+        })
+        .catch(err => {
+            toast.error('Trouble login through Google!');
+            console.log(err);
+        })
+    }
 
 
     return (
@@ -136,7 +148,10 @@ const UserAuthForm = ({ type }) => {
                     <hr className="w-1/2 border-black" />
                 </div>
 
-                <button className="btn-dark flex items-center justify-center gap-4 w-[90%] center">
+                <button className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
+                   onClick={handleGoogleAuth} 
+                >
+
                     <img src={googleIcon} className="w-5" />
                     Continue with Google
                 </button>

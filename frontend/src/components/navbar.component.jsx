@@ -9,6 +9,18 @@ const Navbar = () => {
 
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false)
 
+  const [ userNavPanel, setUserNavPanel ] = useState(false);
+
+  const handleUserNavPanel = () => {
+    setUserNavPanel(currentVal => !currentVal);
+  }
+
+  const handleBlur = () => {
+    setTimeout(() => {
+      setUserNavPanel(false);
+    }, 200);
+  }
+
   const { userAuth, userAuth: { access_token, profile_img } } = useContext(UserContext);
 
 
@@ -43,12 +55,16 @@ const Navbar = () => {
              </button>
           </Link>
           
-          <div className="relative">
+          <div className="relative" onClick={handleUserNavPanel} onBlur={handleBlur}>
             <button className="w-12 h-12">
                 <img src={profile_img} className="w-full h-full object-cover rounded-full" />
             </button>
 
-            <UserNavigationPanel />
+            {
+              userNavPanel ? <UserNavigationPanel />
+              : ""
+            }
+            
 
           </div>
 

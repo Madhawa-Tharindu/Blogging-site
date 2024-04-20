@@ -26,3 +26,7 @@ vendor/
 # Build artifacts
 build/
 dist/
+
+#Google Auth secret code
+server/mern-blogsite-68baf-firebase-adminsdk-w6g3c-cac24ce8ee.json
+

@@ -6,11 +6,14 @@ import { nanoid } from 'nanoid';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
 
+<<<<<<< HEAD
 import admin from "firebase-admin";
 import serviceAccountKey from './mern-blogsite-68baf-firebase-adminsdk-w6g3c-cac24ce8ee.json' assert {type: "json"}
 
 import { getAuth } from "firebase-admin/auth";
 
+=======
+>>>>>>> ebe8ea38b571ed7f445c2c7c70cc3ad4473cba6e
 // import schemas below
 import User from './Schema/User.js';
 
@@ -18,10 +21,13 @@ import User from './Schema/User.js';
 const server = express();
 let PORT = 3000;
 
+<<<<<<< HEAD
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccountKey)
   });
 
+=======
+>>>>>>> ebe8ea38b571ed7f445c2c7c70cc3ad4473cba6e
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
 
@@ -131,6 +137,7 @@ server.post("/login", (req, res) => {
     });
 })
 
+<<<<<<< HEAD
 
 //for Google Auth
 server.post("/google-auth", async (req, res) => {
@@ -182,6 +189,8 @@ server.post("/google-auth", async (req, res) => {
     })
 })
 
+=======
+>>>>>>> ebe8ea38b571ed7f445c2c7c70cc3ad4473cba6e
 server.listen(PORT, () => {
     console.log('listening on port '+ PORT);
 })

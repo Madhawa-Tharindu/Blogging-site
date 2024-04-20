@@ -6,12 +6,21 @@ import { nanoid } from 'nanoid';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
 
+import admin from "firebase-admin";
+import serviceAccountKey from './mern-blogsite-68baf-firebase-adminsdk-w6g3c-cac24ce8ee.json' assert {type: "json"}
+
+import { getAuth } from "firebase-admin/auth";
+
 // import schemas below
 import User from './Schema/User.js';
 
 
 const server = express();
 let PORT = 3000;
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccountKey)
+  });
 
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
@@ -120,6 +129,57 @@ server.post("/login", (req, res) => {
     .catch((err) => {
         return res.status(500).json({"error": err.message});
     });
+})
+
+
+//for Google Auth
+server.post("/google-auth", async (req, res) => {
+    let { access_token } = req.body;
+
+    getAuth()
+    .verifyIdToken(access_token)
+    .then(async (decodedUser) => {
+       
+        let { email, name, picture } = decodedUser;
+
+        picture = picture.replace("s96-c", "s384-c");
+
+        let user = await user.findOne({ "personal_info.email": email}).select("personal_info.fullname personal_info.username personal_info.profile_img google_auth").then((u) => {
+            return u || null
+        })
+        .catch((err) => {
+            console.error("Error in GoogleAuth: ", err);
+            return res.status(500).json({ "error": err.message });
+        });
+
+        if (user) { //login
+            if (!user.google_auth) {
+                //user.google_auth = access_token;
+                return res.status(403).json({ "error": "This email was signed up without Google Authentication. Please login with email and password" });
+            }
+        }
+        else { //signup
+             
+            let username = await generateUserName(email);
+
+            user = new User({
+                personal_info: { fullname: name, email, profile_img: picture, username },
+                google_auth: true
+            })
+            await user.save().then((u) => {
+                user = u;
+            })
+            .catch((err) => {
+                return res.status(500).json({"error": err.message});
+            })
+        } 
+        
+        return res.status(200).json(formatDataToSend(user));
+    })
+    .catch((err) => {
+        console.error("Error in GoogleAuth: ", err);
+        return res.status(500).json({ "error": "Failed to Authenticate you with Google. Try with some other Google account"});
+    })
 })
 
 server.listen(PORT, () => {
